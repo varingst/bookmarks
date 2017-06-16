@@ -1,0 +1,18 @@
+{
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "settings": {
+    "ecmascript": 5,
+  },
+  "plugins": [
+  ],
+  "rules": {
+    "strict": 0,
+    "quotes": 0,
+    "no-unused-vars": 1,
+    "camelcase": 1,
+    "no-underscore-dangle": 0
+  }
+}
