@@ -11,101 +11,88 @@
 }
 
 body {
-    background: var(--bg);
-    font-family: "Arial";
+  background: var(--bg);
+  font-family: "Arial";
 }
 
 #menu {
-    margin: 1em auto;
-    margin-bottom: 1em;
-}
-
-ul#menu li {
-    display: inline;
-    font-size: 120%;
-    background: var(--item-passive);
-    padding: .5em;
-    color: var(--text);
-    margin: 0.2em;
-}
-
-.hotkey {
-  background: var(--bg);
-  color: var(--bg-deco);
-  padding: 0.2em;
-  font-family: "Courier";
-  margin: 0.2em;
-}
-
-
-/*.section a {*/
-#bookmarks a {
-    text-decoration: none;
-    color: var(--text);
-    /*padding: 4px;*/
-}
-
-#bookmarks li {
-    list-style-type: none;
-    font-size: 90%;
-}
-
-div.bookmark {
-    display: inline-block;
-    padding: 0.4em;
-}
-
-div.bookmark a {
-    text-decoration: none;
-}
-
-/*.bookmark .hotkey {*/
-    /*background: var(--item-passive);*/
-/*}*/
-
-div.bookmark:hover {
-    background: var(--item-active);
-}
-
-.group {
-  table-layout: fixed;
-  background: var(--group-bg); */
-}
-.grouplabel {
-  background: none;
-}
-
-.groupcontainer {
-    display: inline-block;
-    margin: 1em;
-    padding: 0;
-    border: 0;
-}
-
-.grouplabel {
-    display: inline-block;
-    color: var(--group-label-text);
-    background: var(--group-bg);
-    padding: 4px 16px;
-    margin-top: 0.0em;
-    font-weight: bold;
-}
-
-.orphan {
-    width: 50%;
-    margin: 0 auto;
-}
-
-.u {
-  text-decoration: underline
+  display: flex;
+  flex-wrap: wrap;
+  /* padding: 0; */
+  justify-content: center;
+  /* align-content: stretch; */
+  /* align-self: center; */
 }
 
 #background {
   position: absolute;
   z-index: -2;
 }
-/*.content {*/
-  /*[>position: relative;<]*/
-  /*z-index: 2;*/
-/*}*/
 
+.section {
+  list-style-type: none;
+  font-size: 120%;
+  background: var(--item-passive);
+  padding: 0.5em;
+  /* padding-right: 0; */
+  color: var(--text);
+  margin: 0.2em
+}
+
+.hotkey {
+  background: var(--bg);
+  color: var(--bg-deco);
+  padding: 0.2em;
+  margin-right: 0.5em;
+  font-family: "Courier";
+}
+
+.label {
+  margin: 1em 0em;
+}
+
+#bookmarks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+#bookmarks a {
+  text-decoration: none;
+  color: var(--text);
+  /* padding: 0.2em; */
+  /* padding-right: 0; */
+  /* margin: 0.2em; */
+}
+
+div.bookmark {
+  display: inline-block;
+  padding: 0.4em;
+}
+
+
+div.bookmark:hover {
+  background: var(--item-active);
+}
+
+.group {
+  table-layout: fixed;
+  background: var(--group-bg); */
+  padding: 0.4em;
+}
+
+
+.groupcontainer {
+  display: inline-block;
+  margin: 1em;
+  border: 0;
+}
+
+.grouplabel {
+  display: inline-block;
+  color: var(--group-label-text);
+  background: var(--group-bg);
+  padding: 0.4em 1em;
+  /* margin-top: 0.0em; */
+  font-weight: bold;
+}

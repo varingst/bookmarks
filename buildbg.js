@@ -1,5 +1,6 @@
 
 function main() { // {{{1
+  // eslint-disable-next-line no-undef
   var canvas = { width: 700, height: 700, opacity: 0.4, color: cssvar("bg-deco") };
   var c = SvgCanvas(canvas);
 
@@ -17,108 +18,107 @@ function main() { // {{{1
     opacity: 0.3,
     'stroke-width': 3,
     fill: canvas.color,
-    anim_interval: 50,
+    animInterval: 50,
   };
 
   // outer ring {{{2
 
-  c.drawCircle(center.x, center.y, 330, 10, extend(common, {
-  }));
+  c.drawCircle(center, 330, 10, extend(common, {}));
 
-  c.drawBrokenRingSegment(center.x, center.y, 300, 40,
+  c.drawBrokenRingSegment(center, 300, 40,
                           80, 350,
                           260, 2, 2,
                           extend(common, segmented, {
-    anim_updater: rotator(center.x, center.y, 0, -0.8)
+    animUpdater: rotator(center, 0, -0.8)
   }));
 
-  c.drawRingSegment(center.x, center.y, 300, 40, 30, 170, extend(common, segmented, {
-    anim_updater: rotator(center.x, center.y, 130, 0.3)
+  c.drawRingSegment(center, 300, 40, 30, 170, extend(common, segmented, {
+    animUpdater: rotator(center, 130, 0.3)
   }));
 
   // mid ring {{{2
 
-  c.drawCircle(center.x, center.y, 250, 10, extend(common, {
-  }));
+  c.drawCircle(center, 250, 10, extend(common, {}));
 
   var midRings = [[  30, 180,   0,  0.2 ],
                   [ 140, 300,  90, -0.5 ],
                   [  45, 125, 170,  0.6 ]]
 
   for (var i = 0; i < midRings.length; i++) {
-    c.drawRingSegment(center.x, center.y, 220, 40, midRings[i][0], midRings[i][1], extend(common, segmented, {
+    c.drawRingSegment(center, 220, 40, midRings[i][0], midRings[i][1], extend(common, segmented, {
       opacity: 0.2,
-      anim_updater: rotator(center.x, center.y, midRings[i][2], midRings[i][3])
+      animUpdater: rotator(center, midRings[i][2], midRings[i][3])
     }));
   }
 
   // inner ring {{{2
 
 
-  c.drawCircle(center.x, center.y, 170, 10, extend(common, {
+  c.drawCircle(center, 170, 10, extend(common, {
   }));
 
-  c.drawBrokenRingSegment(center.x, center.y, 140, 40,
+  c.drawBrokenRingSegment(center, 140, 40,
                     37, 290,
                     200, 4, 4,
                     extend(common, segmented, {
-    anim_updater: rotator(center.x, center.y, 0, -0.4)
+    animUpdater: rotator(center, 0, -0.4)
   }));
-  c.drawBrokenRingSegment(center.x, center.y, 140, 40,
+  c.drawBrokenRingSegment(center, 140, 40,
                     0, 200,
                     40, 40, 40,
                     extend(common, segmented, {
-    anim_updater: rotator(center.x, center.y, 90, 0.6)
+    animUpdater: rotator(center, 90, 0.6)
   }));
 }
 
 function SvgCanvas(attributes) { // {{{1
-  var svgNS = "http://www.w3.org/2000/svg";
-  var bg = document.getElementById('background');
-  var svg = document.createElementNS(svgNS, "svg");
+  var _svgNS = "http://www.w3.org/2000/svg";
+  var _bg = document.getElementById('background');
+  var _svg = document.createElementNS(_svgNS, "svg");
 
-  var xOffset = attributes.width / 2;
-  var yOffset = attributes.height / 2;
+  var _offset = Point(attributes.width / 2, attributes.height / 2);
 
-  svg.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink");
-  bg.appendChild(setAttributes(svg, attributes));
+  _svg.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink");
+  _bg.appendChild(setAttributes(_svg, attributes));
 
 
-  function drawer_for(element, func) { // {{{2
-    return function(...args) {
-      var attributes = func(...args)
+  function drawerFor(element, func) { // {{{2
+    // return function(...args) {
+    return function() {
+      var attributes = func.apply(null, arguments)
+      // var attributes = func(...args)
 
-      var anim_interval = attributes.anim_interval;
-      var anim_updater = attributes.anim_updater;
+      var animInterval = attributes.animInterval;
+      var animUpdater = attributes.animUpdater;
 
-      delete attributes.anim_interval;
-      delete attributes.anim_updater;
+      delete attributes.animInterval;
+      delete attributes.animUpdater;
 
-      var e = document.createElementNS(svgNS, element)
+      var e = document.createElementNS(_svgNS, element)
 
-      if (anim_interval && anim_updater) {
-        anim_updater(e);
-        window.setInterval(function() { anim_updater(e) }, anim_interval);
+      if (animInterval && animUpdater) {
+        animUpdater(e);
+        window.setInterval(function() { animUpdater(e) }, animInterval);
       }
 
-      for (attr in attributes) {
+      for (var attr in attributes) {
         e.setAttributeNS(null, attr, attributes[attr]);
       }
-      svg.appendChild(e);
+      _svg.appendChild(e);
     }
   }
 
   return { // public {{{2
-    drawArc: drawer_for('path', function(x, y, radius, startAngle, endAngle, attributes = {}) { // {{{3
-      return extend(attributes, {
-        d: arc(x, y, radius, startAngle, endAngle)
+    drawArc: drawerFor('path', function(center, radius, startAngle, endAngle, attributes) { // {{{3
+      return extend(attributes || {}, {
+        d: arc(center, radius, startAngle, endAngle)
       })
     }),
 
-    drawCircle: drawer_for('circle', function(x, y, radius, width, attributes = {}) { // {{{3
-      return extend({
-        cx: x || 50,
-        cy: y || 50,
+    drawCircle: drawerFor('circle', function(center, radius, width, attributes) { // {{{3
+      return extend(attributes || {}, {
+        cx: center.x || 50,
+        cy: center.y || 50,
         r:  radius || 50,
         fill: 'none',
         stroke: 'black',
@@ -126,22 +126,22 @@ function SvgCanvas(attributes) { // {{{1
       }, attributes);
     }),
 
-    drawRingSegment: drawer_for('path', function(x, y, radius, width, startAngle, endAngle, attributes) { // {{{3
-      return extend(attributes, {
-        d: ringSegment(x, y, radius, width, startAngle, endAngle)
+    drawRingSegment: drawerFor('path', function(center, radius, width, startAngle, endAngle, attributes) { // {{{3
+      return extend(attributes || {}, {
+        d: ringSegment(center, radius, width, startAngle, endAngle)
       });
     }),
 
-    drawBrokenRingSegment: drawer_for('path', function(x, y, radius, width, // {{{3
+    drawBrokenRingSegment: drawerFor('path', function(center, radius, width, // {{{3
                                                       startAngle, endAngle,
                                                       segStartAngle, segAngleWidth, segSpaceWidth,
                                                       attributes) {
-      var path = [ ringSegment(x, y, radius, width, startAngle, segStartAngle) ];
+      var path = [ ringSegment(center, radius, width, startAngle, segStartAngle) ];
 
       for (var start = segStartAngle + segSpaceWidth;
            start <= endAngle;
            start += (segSpaceWidth + segAngleWidth)) {
-        path.push(ringSegment(x, y, radius, width, start, start + segAngleWidth));
+        path.push(ringSegment(center, radius, width, start, start + segAngleWidth));
       }
 
       return extend(attributes, {
@@ -150,102 +150,111 @@ function SvgCanvas(attributes) { // {{{1
     }),
 
     center: function() { // {{{3
-      var scrCenterX = window.innerWidth / 2;
-      var scrCenterY = window.innerHeight / 2;
+      var scrCenter = Point(window.innerWidth / 2,
+                            window.innerHeight / 2);
 
-      var x = scrCenterX - xOffset;
-      var y = scrCenterY - yOffset;
+      var topleft =   Point(scrCenter.x - _offset.x,
+                            scrCenter.y - _offset.y)
 
-      bg.style.left = x + 'px';
-      bg.style.top =  y + 'px';
+      _bg.style.left = topleft.x + 'px';
+      _bg.style.top =  topleft.y + 'px';
     },
   };
 }
 
 // utility functions  // {{{1
 
-function extend(...args) { // {{{2
+// function extend(...args) { // {{{2
+function extend() {
   var rtn = {};
-  for (var i = 0; i < args.length; i++) {
-    for (var key in args[i]) {
-      rtn[key] = args[i][key];
+  // for (var i = 0; i < args.length; i++) {
+    // for (var key in args[i]) {
+      // rtn[key] = args[i][key];
+    // }
+  // }
+  for (var i = 0; i < arguments.length; i++) {
+    for (var key in arguments[i]) {
+      rtn[key] = arguments[i][key];
     }
   }
   return rtn;
 }
 
 function setAttributes(e, attributes) { // {{{2
-  for (attr in attributes) {
+  for (var attr in attributes) {
     e.setAttribute(attr, attributes[attr]);
   }
   return e;
 }
 
-function rotator(x, y, initial, delta) { // {{{2
-  return (function() {
-    var rotation = initial - delta;
-    return function(elem) {
-      rotation = (rotation + delta) % 360;
-      elem.setAttributeNS(null, 'transform', pack('rotate(', rotation, x, y, ')'));
-    }
-  })();
+function rotator(center, initial, delta) { // {{{2
+  var rotation = initial - delta;
+  return function(elem) {
+    rotation = (rotation + delta) % 360;
+    elem.setAttributeNS(null,
+      'transform',
+      pack('rotate(', rotation, center.x, center.y, ')'));
+  }
 }
 
-function polarToCartesian(x, y, radius, degrees) { // {{{2
+function polarToCartesian(point, radius, degrees) { // {{{2
   var radians = (degrees - 90) * Math.PI / 180.0;
 
-  return {
-    x: x + (radius * Math.cos(radians)),
-    y: y + (radius * Math.sin(radians)),
-  };
+  return Point(
+    point.x + (radius * Math.cos(radians)),
+    point.y + (radius * Math.sin(radians))
+  );
 }
 
-function pack(...args) { // {{{2
-  return args.join(" ");
+// function pack(...args) { // {{{2
+function pack() {
+  // return args.join(" ");
+  return Array.prototype.slice.call(arguments).join(" ")
 }
 
-function move(x, y) { // {{{2
-  return "M " + x + " " + y;
+function move(point) { // {{{2
+  return "M " + point.x + " " + point.y;
 }
 
-function arc(x, y, radius, startAngle, endAngle, doMove = true) { // {{{2
-  var start = polarToCartesian(x, y, radius, endAngle)
-  var end = polarToCartesian(x, y, radius, startAngle)
+function line(point) { // {{{2
+  return "L " + point.x + " " + point.y;
+}
+
+function Point(x, y) { // {{{2
+  return { x: x, y: y }
+}
+
+function arc(point, radius, startAngle, endAngle) { // {{{2
+  var start = polarToCartesian(point, radius, endAngle)
+  var end = polarToCartesian(point, radius, startAngle)
 
   var largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
 
   return pack(
-    doMove ? move(start.x, start.y) : "",
+   move(start),
     "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y
   );
 }
 
-function ringSegment(x, y, radius, width, startAngle, endAngle) { // {{{2
+function ringSegment(point, radius, width, startAngle, endAngle) { // {{{2
   var innerRadius = radius - width / 2;
   var outerRadius = radius + width / 2;
 
-  var startInner = polarToCartesian(x, y, innerRadius, endAngle)
-  var endInner = polarToCartesian(x, y, innerRadius, startAngle)
+  var startInner = polarToCartesian(point, innerRadius, endAngle)
+  var endInner = polarToCartesian(point, innerRadius, startAngle)
 
-  var startOuter = polarToCartesian(x, y, outerRadius, endAngle)
-  var endOuter = polarToCartesian(x, y, outerRadius, startAngle)
+  var startOuter = polarToCartesian(point, outerRadius, endAngle)
+  var endOuter = polarToCartesian(point, outerRadius, startAngle)
 
   var largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
 
     return pack(
-      move(startOuter.x, startOuter.y),
+      move(startOuter),
       "A", outerRadius, outerRadius, 0, largeArcFlag, 0, endOuter.x, endOuter.y,
-      "L", endInner.x, endInner.y,
+      line(endInner),
       "A", innerRadius, innerRadius, 0, largeArcFlag, 1, startInner.x, startInner.y,
-      "L", startOuter.x, startOuter.y
+      line(startOuter)
     );
-}
-
-function line(startX, startY, endX, endY, doMove = true) { // {{{2
-  return pack(
-    doMove ? move(startX, startY) : "",
-    "L", endX, endY
-  );
 }
 
 main(); // {{{1

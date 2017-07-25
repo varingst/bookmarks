@@ -1,9 +1,11 @@
 function main() {
-  myMenu = Menu();
+  var myMenu = Menu();
   // iterate over declaration in index.html
+  /* eslint-disable no-undef */
   for (var section in MENU) {
     myMenu.add(section, MENU[section]);
   }
+  /* eslint-enable no-undef */
 }
 
 var Menu = function() { // {{{1
@@ -14,11 +16,17 @@ var Menu = function() { // {{{1
   var _menuElement = document.getElementById('menu');
   var _bookmarks = document.getElementById('bookmarks');
 
+  // Chrome, Safari, Opera
+  _bookmarks.addEventListener("mousewheel", mouseWheelHandler, false);
+  // Firefox
+  _bookmarks.addEventListener("DOMMouseScroll", mouseWheelHandler, false);
+
+
   // private methods {{{2
 
   function clearBookmarks() { // {{{3
     _hotKeys.clearDynamic();
-    for (entry in _orphans) {
+    for (var entry in _orphans) {
       delete _orphans[entry];
     }
     while (_bookmarks.firstChild) {
@@ -26,9 +34,21 @@ var Menu = function() { // {{{1
     }
   }
 
+  function mouseWheelHandler(e) {
+    var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+    var toShift;
+    if (delta < 0) {
+      toShift = _bookmarks.removeChild(_bookmarks.lastChild);
+      _bookmarks.insertBefore(toShift, _bookmarks.firstChild);
+    } else {
+      toShift = _bookmarks.removeChild(_bookmarks.firstChild);
+      _bookmarks.appendChild(toShift);
+    }
+  }
+
   function make(elem, props) { // {{{3
     var e = document.createElement(elem)
-    for (prop in (props || {})) {
+    for (var prop in (props || {})) {
       switch(prop) {
         case 'class':
           e.className = props[prop];
@@ -59,7 +79,7 @@ var Menu = function() { // {{{1
   function fillGroup(group, content) { // {{{3
     var columns = 2;
     var i = 0;
-    for (title in content) {
+    for (var title in content) {
       if (i++ % columns == 0) {
         var row = group.insertRow();
       }
@@ -89,7 +109,9 @@ var Menu = function() { // {{{1
     } else if (typeof content === 'object') {
       _bookmarks.appendChild(makeGroup(title, content));
     } else {
-      console.log(typeof content);
+      throw new Error("Malformed entry, " +
+                      "expected object or string, got: " +
+                      typeof content);
     }
   }
 
@@ -97,7 +119,7 @@ var Menu = function() { // {{{1
   function showSection(section) { // {{{3
     clearBookmarks();
 
-    for (menuSection in _sections) {
+    for (var menuSection in _sections) {
       if (menuSection == section) {
         var showing = _sections[section].declaration;
         for (var title in showing) {
@@ -106,8 +128,10 @@ var Menu = function() { // {{{1
         if (Object.keys(_orphans).length > 0) {
           buildEntry(section, _orphans);
         }
+        // eslint-disable-next-line no-undef
         _sections[menuSection].label.style.background = cssvar("item-active");
       } else {
+        // eslint-disable-next-line no-undef
         _sections[menuSection].label.style.background = cssvar("item-passive");
       }
     }
@@ -117,7 +141,7 @@ var Menu = function() { // {{{1
     add: function(title, sectionDeclaration) { // {{{2
       var parsed = _hotKeys.add(title, showSection);
 
-      var section = make('li', { class: "section", onmouseover: parsed.show })
+      var section = make('div', { class: "section", onmouseover: parsed.show })
       section.appendChild(makeHotKey(parsed.key));
       section.appendChild(make('span', { class: "label", innerHTML: parsed.title}));
       _sections[parsed.title] = {
@@ -220,7 +244,9 @@ var HotKeys = function() { // {{{1
       var wanted = rtn.key;
       rtn.key = _assigned.take(rtn.key, isDynamic)
       if (rtn.key == null) {
-        console.log(title + ": key '" + wanted + "' already taken");
+        throw new Error("Duplicate key assignment for " +
+                        title + ", " +
+                        "'" + wanted + "' already taken");
       }
     } // so this acts as fallback
     if (!rtn.key) {
