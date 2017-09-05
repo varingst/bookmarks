@@ -175,6 +175,12 @@ var HotKeys = function() { // {{{1
       table[char] = keyCode++;
     }
 
+    keyCode = 48; // "0"
+    while (keyCode <= 48 + 9) {
+      char = String.fromCharCode(keyCode);
+      table[char] = keyCode++;
+    }
+
     return function(char) {
       return table[char];
     }
@@ -182,7 +188,7 @@ var HotKeys = function() { // {{{1
 
   var _assigned = (function() { // {{{2
     // dynamic hotkey assigner
-    var priority = "jfkdls;ahgurieowpqytmv,c.x/z".split('');
+    var priority = "jfkdls;ahgurieowpqytmv,c.x/z1234567890".split('');
     var dynamic = [];
     return {
       next: function() { // {{{3
