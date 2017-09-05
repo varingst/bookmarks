@@ -34,7 +34,8 @@ var Menu = function() { // {{{1
     }
   }
 
-  function mouseWheelHandler(e) {
+  function mouseWheelHandler(e) { // {{{3
+    e.preventDefault();
     var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
     var toShift;
     if (delta < 0) {
@@ -136,6 +137,7 @@ var Menu = function() { // {{{1
       }
     }
   }
+
 
   return {
     add: function(title, sectionDeclaration) { // {{{2
