@@ -2,8 +2,8 @@ function main() {
   var myMenu = Menu();
   // iterate over declaration in index.html
   /* eslint-disable no-undef */
-  for (var section in MENU) {
-    myMenu.add(section, MENU[section]);
+  for (var section in BOOKMARKS) {
+    myMenu.add(section, BOOKMARKS[section]);
   }
   /* eslint-enable no-undef */
 }

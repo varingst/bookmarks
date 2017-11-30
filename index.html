@@ -1,163 +1,11 @@
-<html> <!-- {{{1 -->
+<html>
   <head>
     <title>Bookmarks</title>
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="style.css">
-    <script>
-var MENU = { // {{{1
-  '<A>pp': { // {{{2
-    '<T>ransmission': "http://localhost:9091/",
-    '<S>yncthing':    "http://localhost:8384/",
-  },
-  '<N>ews & Misc': { // {{{2
-    'News': {
-      'A<f>tenposten':              "https://www.aftenposten.no",
-      'Morgen<b>ladet':             "https://www.morgenbladet.no",
-      'NY <T>imes':                 "https://www.nytimes.com",
-      'Le <M>onde':                 "http://www.lemonde.fr",
-      'Die W<e>lt':                 "https://www.welt.de",
-      'Asahi <S>hinbun':            "http://www.asahi.com/ajw",
-      "Hacker News":                "https://news.ycombinator.com",
-      "Ha<r>vard Business Review":  "https://hbr.org",
-    },
-    'Misc': {
-      'Brain Cleanser': "https://streamable.com/9evsw",
-    },
-  },
-  '<W>ebDev': { // {{{2
-    Localhost: {
-      3000: "http://localhost:3000",
-      3001: "http://localhost:3001",
-    },
-
-    'Ruby': {
-      'Nokog<i>ri': 'https://github.com/sparklemotion/nokogiri/wiki/Cheat-sheet',
-      'Gem DIY':    'http://guides.rubygems.org/make-your-own-gem/',
-    },
-
-    Rails: {
-      Guides:     'http://guides.rubyonrails.org/',
-      API:        'http://api.rubyonrails.org/',
-      Migrations: 'http://edgeguides.rubyonrails.org/active_record_migrations.html',
-    },
-
-    React: {
-      'TopLevel API':  "https://facebook.github.io/react/docs/react-api.html",
-      'Component API': "https://facebook.github.io/react/docs/component-api.html",
-    },
-
-    JavaScript: {
-      'ES6 Features':      "http://es6-features.org",
-      'NodeJS API':        "https://nodejs.org/api/",
-      'Mozilla WebAPIs':   "https://developer.mozilla.org/en-US/docs/Web/API",
-      'JSFiddle':          "https://jsfiddle.net",
-      'ESLint Rules':      "http://eslint.org/docs/rules/",
-      'Jasmine Matchers':  "https://jasmine.github.io/api/2.6/matchers.html",
-    },
-
-    CSS: {
-      'SASS Reference':       "http://sass-lang.com/documentation/file.SASS_REFERENCE.html",
-      'Semantic UI':          "https://semantic-ui.com/introduction/getting-started.html",
-      'Bootstrap Reference':  "http://www.w3schools.com/bootstrap/bootstrap_ref_css_text.asp",
-      'W3 CSS Reference':     "http://www.w3schools.com/cssref/default.asp",
-      'CSS Visual Reference': "http://cssreference.io/#hn",
-      'Flexbox': "https://css-tricks.com/snippets/css/a-guide-to-flexbox/",
-    },
-
-    'Anim & SVG': {
-      'GSAP': 'https://greensock.com',
-      'mo.js': 'http:/mojs.io',
-      'Learn Inkscape': "https://inkscape.org/en/learn/",
-    },
-
-    CoffeeScript: "http://coffeescript.org/#language",
-
-    'Browser DevTools': {
-      Firefox: "https://developer.mozilla.org/en-US/docs/Tools",
-      Chrome:  "https://developers.google.com/web/tools/chrome-devtools/",
-      Opera:   "https://dev.opera.com/extensions/testing/",
-    },
-
-    'Homepage': {
-      Domain: 'https://www.nic.st',
-      Parking: 'https://panel.hosting.st',
-    }
-  },
-  '<J>apanese': { // {{{2
-    Lookup: {
-      '<T>angorin':          "http://tangorin.com/examples/",
-      Tatoeba:               "http://tatoeba.org/eng/sentences/search?from=jpn&to=eng&query=",
-      'Unicode Kanji Table': "http://www.rikai.com/library/kanjitables/kanji_codes.unicode.shtml",
-      'Days & Months':       "http://www.learn-japanese-adventure.com/japanese-numbers-day-month-week.html",
-    },
-
-    Practice: {
-      TobiraWeb: "http://tobiraweb.9640.jp/",
-      JTest4you: "http://japanesetest4you.com/category/jlpt-n5/jlpt-n5-listening-test/",
-      'Aesop Fables': "http://hukumusume.com/douwa/pc/aesop/",
-      'AudioBooks': "http://rtkwiki.koohii.com/wiki/Japanese_Audiobooks_with_Transcripts",
-    },
-
-    Tools: {
-      'Anki <M>anual':  "http://ankisrs.net/docs/manual.html",
-      'Tagaini Jisho Manual': "https://www.tagaini.net/manual",
-      'Popjisyo': 'http://www.popjisyo.com/WebHint/Portal_e.aspx',
-      'Rikai': 'http://www.rikai.com',
-    },
-
-    'Misc Language': {
-      Etymonline: "http://etymonline.com/",
-    },
-
-  },
-  '<O>S & HW': { // {{{2
-    "Gentoo/Linux": {
-      Handbook:          "https://wiki.gentoo.org/wiki/Handbook:Main_Page",
-      'Writing <u>dev Rules':     "http://www.reactivated.net/writing_udev_rules.html",
-    },
-
-    "Gentoo Ebuilds": {
-      '<E>build Writing':  "https://devmanual.gentoo.org/ebuild-writing/",
-      'Eclass Reference': "https://devmanual.gentoo.org/eclass-reference/",
-      'Ebuild format': "https://devmanual.gentoo.org/eclass-reference/ebuild/index.html",
-      'Install Functions Reference': "https://devmanual.gentoo.org/function-reference/install-functions/",
-    },
-
-    AwesomeWM: {
-      'Awe<s>ome 4 API':          "https://awesomewm.org/apidoc/",
-      'Lua 5.1 Reference':      "https://www.lua.org/manual/5.1/",
-    },
-
-    "Shell & Config": {
-      'GNU <p>arallels':            "https://www.gnu.org/software/parallel/parallel_tutorial.html",
-      'Bash Completion': "https://debian-administration.org/article/316/An_introduction_to_bash_completion_part_1",
-    },
-    'Conky Configuration':      "https://github.com/brndnmtthws/conky/wiki/Configuration-Variables",
-
-    'MacBookPro Internals': "https://www.ifixit.com/Device/MacBook_Pro_13%22_Unibody_Mid_2010,"
-
-  },
-  '<C>ompSci': { // {{{2
-    Reference: {
-      'AlgDat Dictionary': "https://xlinux.nist.gov/dads/",
-      'BottomUp CompSci':  "https://www.bottomupcs.com/",
-    },
-    Assignments: {
-      'Stanford Nifty':    "http://nifty.stanford.edu",
-    },
-  },
-  '<G>ameDev': { // {{{2
-    'Game Programming Patterns':  "http://gameprogrammingpatterns.com/introduction.html",
-    'Gosu Reference':             "https://www.libgosu.org/rdoc/",
-    'Doom3 BFG Doc':              "http://fabiensanglard.net/doom3_documentation/index.php",
-    'C Boot Camp':                "http://gribblelab.org/CBootcamp/",
-    'Linux Profiling Tools':      "http://www.pixelbeat.org/programming/profiling/",
-  },
-}
-    </script>
   </head>
 
-  <body> <!-- {{{1 -->
+  <body>
     <div id="background"></div>
     <div id="content">
       <div id="menu"></div>
@@ -165,9 +13,8 @@ var MENU = { // {{{1
     </div>
 
     <script src="helpers.js"></script>
+    <script src="bookmarks.js"></script>
     <script src="buildmenu.js"></script>
     <script src="buildbg.js"></script>
   </body>
 </html>
-
-<!-- vim: set textwidth=130 : -->
