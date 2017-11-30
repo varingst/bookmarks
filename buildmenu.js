@@ -194,14 +194,14 @@ var HotKeys = function() { // {{{1
     var dynamic = [];
     return {
       next: function() { // {{{3
-        for (var i = 0; i < priority.length; i++) {
-          var code = keyCode(priority[i])
+        return priority.find(function(char) {
+          var code = keyCode(char);
           if (code in _bindings) {
-            continue
+            return;
           }
           dynamic.push(code);
-          return priority[i];
-        }
+          return char;
+        });
       },
 
       take: function(key, isDynamic) { // {{{3
@@ -216,9 +216,9 @@ var HotKeys = function() { // {{{1
       },
 
       clear: function() { // {{{3
-        for (var i = 0; i < dynamic.length; i++) {
-          delete _bindings[dynamic[i]];
-        }
+        dynamic.forEach(function(code) {
+          delete _bindings[code];
+        });
         dynamic.length = 0;
       }
     }
