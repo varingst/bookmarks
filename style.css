@@ -13,6 +13,7 @@
 body {
   background: var(--bg);
   font-family: "Arial";
+  overflow-y: hidden;
 }
 
 #menu {
