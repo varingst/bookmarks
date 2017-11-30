@@ -32,7 +32,7 @@ function main() { // {{{1
     80, 350,    /* startAngle, endAngle */
     260, 2, 2,  /* segStartAngle, segAngleWidth, segSpaceWidth */
     extend(style.common, style.segmented, {
-      animUpdater: rotator(center, 0, -0.8)
+      animUpdater: rotatorFor(center, 0, -0.8)
     }
   ));
 
@@ -40,7 +40,7 @@ function main() { // {{{1
     300, 40, /* radius, width */
     30, 170, /* startAngle, endAngle */
     extend(style.common, style.segmented, {
-      animUpdater: rotator(center, 130, 0.3)
+      animUpdater: rotatorFor(center, 130, 0.3)
     }
   ));
 
@@ -48,25 +48,21 @@ function main() { // {{{1
 
   c.drawCircle(center, 250, 10, style.common);
 
-               /* [ startAngle, endAngle, initialAngle, delta ] */
-  var midRings = [[         30,      180,            0,   0.2 ],
-                  [        140,      300,           90,  -0.5 ],
-                  [         45,      125,          170,   0.6 ]]
-
-  for (var i = 0; i < midRings.length; i++) {
+/* [ startAngle, endAngle, initialAngle, delta ] */
+  [[         30,      180,            0,   0.2 ],
+   [        140,      300,           90,  -0.5 ],
+   [         45,      125,          170,   0.6 ]].forEach(function(ring) {
     c.drawRingSegment(center,
-      220, 40,                         /* radius, width */
-      midRings[i][0], midRings[i][1],  /* startAngle, endAngle */
+      220, 40,           /* radius, width */
+      ring[0], ring[1],  /* startAngle, endAngle */
       extend(style.common, style.segmented, {
         opacity: 0.2,
-        animUpdater: rotator(center,
-                             midRings[i][2],  /* initialAngle */
-                             midRings[i][3])  /* delta */
-      }
-    ));
-  }
-
-  // inner ring {{{2
+        animUpdater: rotatorFor(center,
+                                ring[2],  /* initialAngle */
+                                ring[3])  /* delta */
+      })
+    )
+  });
 
   c.drawCircle(center, 170, 10, style.common);
 
@@ -75,7 +71,7 @@ function main() { // {{{1
     37, 290,    /* startAngle, endAngle */
     200, 4, 4,  /* segStartAngle, segAngleWidth, segSpaceWidth */
     extend(style.common, style.segmented, {
-      animUpdater: rotator(center, 0, -0.4)
+      animUpdater: rotatorFor(center, 0, -0.4)
     }
   ));
 
@@ -84,7 +80,7 @@ function main() { // {{{1
     0, 200,      /* startAngle, endAngle */
     40, 40, 40,  /* segStartAngle, segAngleWidth, segSpaceWidth */
     extend(style.common, style.segmented, {
-      animUpdater: rotator(center, 90, 0.6)
+      animUpdater: rotatorFor(center, 90, 0.6)
     }
   ));
 }
@@ -198,7 +194,7 @@ function setAttributes(e, attributes) { // {{{2
   return e;
 }
 
-function rotator(center, initial, delta) { // {{{2
+function rotatorFor(center, initial, delta) { // {{{2
   var rotation = initial - delta;
   return function(elem) {
     rotation = (rotation + delta) % 360;
