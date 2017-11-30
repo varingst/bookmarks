@@ -7,68 +7,86 @@ function main() { // {{{1
   c.center();
   window.onresize = c.center;
 
-  var center = { x: canvas.width / 2, y: canvas.height / 2 };
+  var center = Point(canvas.width / 2, canvas.height / 2);
 
-  var common = {
-    stroke: canvas.color,
-    opacity: canvas.opacity,
-  };
+  var style = {
+    common: {
+      stroke: canvas.color,
+      opacity: canvas.opacity,
+    },
 
-  var segmented = {
-    opacity: 0.3,
-    'stroke-width': 3,
-    fill: canvas.color,
-    animInterval: 50,
-  };
+    segmented: {
+      opacity: 0.3,
+      'stroke-width': 3,
+      fill: canvas.color,
+      animInterval: 50,
+    }
+  }
 
   // outer ring {{{2
 
-  c.drawCircle(center, 330, 10, extend(common, {}));
+  c.drawCircle(center, 330, 10, style.common);
 
-  c.drawBrokenRingSegment(center, 300, 40,
-                          80, 350,
-                          260, 2, 2,
-                          extend(common, segmented, {
-    animUpdater: rotator(center, 0, -0.8)
-  }));
+  c.drawBrokenRingSegment(center,
+    300, 40,    /* radius, width */
+    80, 350,    /* startAngle, endAngle */
+    260, 2, 2,  /* segStartAngle, segAngleWidth, segSpaceWidth */
+    extend(style.common, style.segmented, {
+      animUpdater: rotator(center, 0, -0.8)
+    }
+  ));
 
-  c.drawRingSegment(center, 300, 40, 30, 170, extend(common, segmented, {
-    animUpdater: rotator(center, 130, 0.3)
-  }));
+  c.drawRingSegment(center,
+    300, 40, /* radius, width */
+    30, 170, /* startAngle, endAngle */
+    extend(style.common, style.segmented, {
+      animUpdater: rotator(center, 130, 0.3)
+    }
+  ));
 
   // mid ring {{{2
 
-  c.drawCircle(center, 250, 10, extend(common, {}));
+  c.drawCircle(center, 250, 10, style.common);
 
-  var midRings = [[  30, 180,   0,  0.2 ],
-                  [ 140, 300,  90, -0.5 ],
-                  [  45, 125, 170,  0.6 ]]
+               /* [ startAngle, endAngle, initialAngle, delta ] */
+  var midRings = [[         30,      180,            0,   0.2 ],
+                  [        140,      300,           90,  -0.5 ],
+                  [         45,      125,          170,   0.6 ]]
 
   for (var i = 0; i < midRings.length; i++) {
-    c.drawRingSegment(center, 220, 40, midRings[i][0], midRings[i][1], extend(common, segmented, {
-      opacity: 0.2,
-      animUpdater: rotator(center, midRings[i][2], midRings[i][3])
-    }));
+    c.drawRingSegment(center,
+      220, 40,                         /* radius, width */
+      midRings[i][0], midRings[i][1],  /* startAngle, endAngle */
+      extend(style.common, style.segmented, {
+        opacity: 0.2,
+        animUpdater: rotator(center,
+                             midRings[i][2],  /* initialAngle */
+                             midRings[i][3])  /* delta */
+      }
+    ));
   }
 
   // inner ring {{{2
 
+  c.drawCircle(center, 170, 10, style.common);
 
-  c.drawCircle(center, 170, 10, extend(common, {
-  }));
+  c.drawBrokenRingSegment(center,
+    140, 40,    /* radius, width */
+    37, 290,    /* startAngle, endAngle */
+    200, 4, 4,  /* segStartAngle, segAngleWidth, segSpaceWidth */
+    extend(style.common, style.segmented, {
+      animUpdater: rotator(center, 0, -0.4)
+    }
+  ));
 
-  c.drawBrokenRingSegment(center, 140, 40,
-                    37, 290,
-                    200, 4, 4,
-                    extend(common, segmented, {
-    animUpdater: rotator(center, 0, -0.4)
-  }));
-  c.drawBrokenRingSegment(center, 140, 40,
-                    0, 200,
-                    40, 40, 40,
-                    extend(common, segmented, {
-    animUpdater: rotator(center, 90, 0.6)
-  }));
+  c.drawBrokenRingSegment(center,
+    140, 40,     /* radius, width */
+    0, 200,      /* startAngle, endAngle */
+    40, 40, 40,  /* segStartAngle, segAngleWidth, segSpaceWidth */
+    extend(style.common, style.segmented, {
+      animUpdater: rotator(center, 90, 0.6)
+    }
+  ));
 }
 
 function SvgCanvas(attributes) { // {{{1
@@ -144,9 +162,7 @@ function SvgCanvas(attributes) { // {{{1
         path.push(ringSegment(center, radius, width, start, start + segAngleWidth));
       }
 
-      return extend(attributes, {
-        d: pack(path)
-      })
+      return extend(attributes, { d: path.join(' ') });
     }),
 
     center: function() { // {{{3
@@ -167,11 +183,6 @@ function SvgCanvas(attributes) { // {{{1
 // function extend(...args) { // {{{2
 function extend() {
   var rtn = {};
-  // for (var i = 0; i < args.length; i++) {
-    // for (var key in args[i]) {
-      // rtn[key] = args[i][key];
-    // }
-  // }
   for (var i = 0; i < arguments.length; i++) {
     for (var key in arguments[i]) {
       rtn[key] = arguments[i][key];
@@ -206,18 +217,16 @@ function polarToCartesian(point, radius, degrees) { // {{{2
   );
 }
 
-// function pack(...args) { // {{{2
-function pack() {
-  // return args.join(" ");
-  return Array.prototype.slice.call(arguments).join(" ")
+function pack() { // {{{2
+  return Array.prototype.slice.call(arguments).join(' ');
 }
 
 function move(point) { // {{{2
-  return "M " + point.x + " " + point.y;
+  return pack('M', point.x, point.y);
 }
 
 function line(point) { // {{{2
-  return "L " + point.x + " " + point.y;
+  return pack('L', point.x, point.y);
 }
 
 function Point(x, y) { // {{{2
@@ -231,7 +240,7 @@ function arc(point, radius, startAngle, endAngle) { // {{{2
   var largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
 
   return pack(
-   move(start),
+    move(start),
     "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y
   );
 }
@@ -240,21 +249,21 @@ function ringSegment(point, radius, width, startAngle, endAngle) { // {{{2
   var innerRadius = radius - width / 2;
   var outerRadius = radius + width / 2;
 
-  var startInner = polarToCartesian(point, innerRadius, endAngle)
-  var endInner = polarToCartesian(point, innerRadius, startAngle)
+  var startInner = polarToCartesian(point, innerRadius, endAngle);
+  var endInner = polarToCartesian(point, innerRadius, startAngle);
 
-  var startOuter = polarToCartesian(point, outerRadius, endAngle)
-  var endOuter = polarToCartesian(point, outerRadius, startAngle)
+  var startOuter = polarToCartesian(point, outerRadius, endAngle);
+  var endOuter = polarToCartesian(point, outerRadius, startAngle);
 
   var largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
 
-    return pack(
-      move(startOuter),
-      "A", outerRadius, outerRadius, 0, largeArcFlag, 0, endOuter.x, endOuter.y,
-      line(endInner),
-      "A", innerRadius, innerRadius, 0, largeArcFlag, 1, startInner.x, startInner.y,
-      line(startOuter)
-    );
+  return pack(
+    move(startOuter),
+    "A", outerRadius, outerRadius, 0, largeArcFlag, 0, endOuter.x, endOuter.y,
+    line(endInner),
+    "A", innerRadius, innerRadius, 0, largeArcFlag, 1, startInner.x, startInner.y,
+    line(startOuter)
+  );
 }
 
 main(); // {{{1
