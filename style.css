@@ -41,7 +41,7 @@ body {
   color: var(--bg-deco);
   padding: 0.2em;
   margin-right: 0.5em;
-  font-family: "Courier";
+  font-family: "Monospace";
 }
 
 .label {
@@ -49,7 +49,8 @@ body {
 }
 
 #container {
-  width: 100%;
+  display: flex;
+  justify-content: center;
   height: 100%;
 }
 
@@ -58,7 +59,9 @@ body {
   flex-wrap: wrap;
   justify-content: center;
   position: relative;
-  top: 20%;
+  align-content: center;
+  width: 80%;
+  height: 80%;
 }
 
 #bookmarks a {
@@ -95,4 +98,19 @@ div.bookmark:hover {
   background: var(--group-bg);
   padding: 0.4em 1em;
   font-weight: bold;
+}
+
+#input {
+  /* display: inline-block; */
+  /* position: fixed; */
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+textarea {
+  padding: 1em;
+  width: 90%;
 }

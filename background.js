@@ -21,7 +21,7 @@ function main() { // {{{1
       fill: canvas.color,
       animInterval: 50,
     }
-  }
+  };
 
   // outer ring {{{2
 
@@ -61,7 +61,7 @@ function main() { // {{{1
                                 ring[2],  /* initialAngle */
                                 ring[3])  /* delta */
       })
-    )
+    );
   });
 
   c.drawCircle(center, 170, 10, style.common);
@@ -99,7 +99,7 @@ function SvgCanvas(attributes) { // {{{1
   function drawerFor(element, func) { // {{{2
     // return function(...args) {
     return function() {
-      var attributes = func.apply(null, arguments)
+      var attributes = func.apply(null, arguments);
       // var attributes = func(...args)
 
       var animInterval = attributes.animInterval;
@@ -108,25 +108,25 @@ function SvgCanvas(attributes) { // {{{1
       delete attributes.animInterval;
       delete attributes.animUpdater;
 
-      var e = document.createElementNS(_svgNS, element)
+      var e = document.createElementNS(_svgNS, element);
 
       if (animInterval && animUpdater) {
         animUpdater(e);
-        window.setInterval(function() { animUpdater(e) }, animInterval);
+        window.setInterval(function() { animUpdater(e); }, animInterval);
       }
 
       for (var attr in attributes) {
         e.setAttributeNS(null, attr, attributes[attr]);
       }
       _svg.appendChild(e);
-    }
+    };
   }
 
   return { // public {{{2
     drawArc: drawerFor('path', function(center, radius, startAngle, endAngle, attributes) { // {{{3
       return extend(attributes || {}, {
         d: arc(center, radius, startAngle, endAngle)
-      })
+      });
     }),
 
     drawCircle: drawerFor('circle', function(center, radius, width, attributes) { // {{{3
@@ -166,7 +166,7 @@ function SvgCanvas(attributes) { // {{{1
                             window.innerHeight / 2);
 
       var topleft =   Point(scrCenter.x - _offset.x,
-                            scrCenter.y - _offset.y)
+                            scrCenter.y - _offset.y);
 
       _bg.style.left = topleft.x + 'px';
       _bg.style.top =  topleft.y + 'px';
@@ -201,7 +201,7 @@ function rotatorFor(center, initial, delta) { // {{{2
     elem.setAttributeNS(null,
       'transform',
       pack('rotate(', rotation, center.x, center.y, ')'));
-  }
+  };
 }
 
 function polarToCartesian(point, radius, degrees) { // {{{2
@@ -226,12 +226,12 @@ function line(point) { // {{{2
 }
 
 function Point(x, y) { // {{{2
-  return { x: x, y: y }
+  return { x: x, y: y };
 }
 
 function arc(point, radius, startAngle, endAngle) { // {{{2
-  var start = polarToCartesian(point, radius, endAngle)
-  var end = polarToCartesian(point, radius, startAngle)
+  var start = polarToCartesian(point, radius, endAngle);
+  var end = polarToCartesian(point, radius, startAngle);
 
   var largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
 

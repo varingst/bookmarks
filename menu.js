@@ -1,17 +1,43 @@
+
 function main() {
   var myMenu = Menu();
-  // iterate over declaration in index.html
   /* eslint-disable no-undef */
-  for (var section in BOOKMARKS) {
-    myMenu.add(section, BOOKMARKS[section]);
+  if (typeof BOOKMARKS !== 'undefined') {
+    // build menu from bookmarks.js
+    myMenu.build(BOOKMARKS);
+  } else {
+    // build menu from textarea content
+    var input = document.getElementById('input');
+    var ielem = make('textarea', { autofocus: true, rows: 32 });
+    var mkmenu = menuMaker(myMenu);
+    ielem.addEventListener('input', mkmenu);
+    input.appendChild(ielem);
+    ielem.innerHTML = defaultJSON;
+    mkmenu({ target: { value: defaultJSON }});
   }
   /* eslint-enable no-undef */
+}
+
+function menuMaker(menu) {
+  var lastWorking;
+  return function(e) {
+    try {
+      var bookmarks = JSON.parse(e.target.value);
+      menu.build(bookmarks);
+      lastWorking = bookmarks;
+    } catch(_) {
+      menu.build(lastWorking);
+    } finally {
+      menu.restore();
+    }
+  };
 }
 
 var Menu = function() { // {{{1
   var _hotKeys = HotKeys();
   var _sections = {};
   var _orphans = {};
+  var _selected;
 
   var _menuElement = document.getElementById('menu');
   var _bookmarks = document.getElementById('bookmarks');
@@ -38,6 +64,7 @@ var Menu = function() { // {{{1
     e.preventDefault();
     var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
     var toShift;
+    if (_bookmarks.childElementCount === 0) { return; }
     if (delta < 0) {
       toShift = _bookmarks.removeChild(_bookmarks.lastChild);
       _bookmarks.insertBefore(toShift, _bookmarks.firstChild);
@@ -45,26 +72,6 @@ var Menu = function() { // {{{1
       toShift = _bookmarks.removeChild(_bookmarks.firstChild);
       _bookmarks.appendChild(toShift);
     }
-  }
-
-  function make(elem, props) { // {{{3
-    var e = document.createElement(elem)
-    for (var prop in (props || {})) {
-      switch(prop) {
-        case 'class':
-          e.className = props[prop];
-          break;
-        default:
-          e[prop] = props[prop];
-      }
-    }
-    return e;
-  }
-
-  function makeLink(title, url) { // {{{3
-    var span = make('span');
-    span.appendChild(make('a', { innerHTML: title, href: url }));
-    return span;
   }
 
   function makeGroup(label, content) { // {{{3
@@ -85,7 +92,7 @@ var Menu = function() { // {{{1
         var row = group.insertRow();
       }
       var url = content[title];
-      var cell = row.appendChild(make('td'))
+      var cell = row.appendChild(make('td'));
       cell.appendChild(makeBookmark(title, url));
     }
   }
@@ -116,7 +123,6 @@ var Menu = function() { // {{{1
     }
   }
 
-
   function showSection(section) { // {{{3
     clearBookmarks();
 
@@ -131,6 +137,7 @@ var Menu = function() { // {{{1
         }
         // eslint-disable-next-line no-undef
         _sections[menuSection].label.style.background = cssvar("item-active");
+        _selected = section;
       } else {
         // eslint-disable-next-line no-undef
         _sections[menuSection].label.style.background = cssvar("item-passive");
@@ -138,20 +145,41 @@ var Menu = function() { // {{{1
     }
   }
 
+  function add(title, sectionDeclaration) { // {{{2
+    var parsed = _hotKeys.add(title, showSection);
+
+    var section = make('div', { class: "section", onmouseover: parsed.show });
+    section.appendChild(makeHotKey(parsed.key));
+    section.appendChild(make('span', { class: "label", innerHTML: parsed.title}));
+    _sections[parsed.title] = {
+      declaration: sectionDeclaration,
+      label: section
+    };
+
+    _menuElement.appendChild(section);
+  }
+
+  function clearAll() {
+    clearBookmarks();
+    _hotKeys.clearAll();
+    while(_menuElement.firstChild) {
+      _menuElement.removeChild(_menuElement.firstChild);
+    }
+    while(_bookmarks.firstChild) {
+      _bookmarks.removeChild(_bookmarks.firstChild);
+    }
+  }
 
   return {
-    add: function(title, sectionDeclaration) { // {{{2
-      var parsed = _hotKeys.add(title, showSection);
+    restore: function () {
+      showSection(_selected);
+    },
 
-      var section = make('div', { class: "section", onmouseover: parsed.show })
-      section.appendChild(makeHotKey(parsed.key));
-      section.appendChild(make('span', { class: "label", innerHTML: parsed.title}));
-      _sections[parsed.title] = {
-        declaration: sectionDeclaration,
-        label: section
-      };
-
-      _menuElement.appendChild(section);
+    build: function(bookmarks) {
+      clearAll();
+      for (var section in bookmarks) {
+        add(section, bookmarks[section]);
+      }
     }
   };
 };
@@ -185,7 +213,7 @@ var HotKeys = function() { // {{{1
 
     return function(char) {
       return table[char];
-    }
+    };
   })();
 
   var _assigned = (function() { // {{{2
@@ -205,7 +233,7 @@ var HotKeys = function() { // {{{1
       },
 
       take: function(key, isDynamic) { // {{{3
-        var code = keyCode(key)
+        var code = keyCode(key);
         if (code in _bindings) {
           return null;
         }
@@ -215,16 +243,26 @@ var HotKeys = function() { // {{{1
         return key;
       },
 
-      clear: function() { // {{{3
+      clearDynamic: function() { // {{{3
         dynamic.forEach(function(code) {
           delete _bindings[code];
         });
         dynamic.length = 0;
+      },
+
+      clearAll: function() { // {{{3
+        for (var code in _bindings) {
+          delete _bindings[code];
+        }
+        dynamic.length = 0;
       }
-    }
+    };
   })();
 
   document.addEventListener('keydown', function(event) { // {{{2
+    if (document.getElementById('input').firstChild === document.activeElement) {
+      return;
+    }
     var func = _bindings[event.keyCode];
     if(func) {
       func(event);
@@ -245,12 +283,12 @@ var HotKeys = function() { // {{{1
   }
 
   function bestKey(title, isDynamic) { // {{{3
-    // check if there's a & in the title to designate hotkey
+    // check if there's a < > in the title to designate hotkey
     var rtn = findHotKey(title);
     if (rtn.key) {
       // it they key is already taken, _assigned.take() returns null
       var wanted = rtn.key;
-      rtn.key = _assigned.take(rtn.key, isDynamic)
+      rtn.key = _assigned.take(rtn.key, isDynamic);
       if (rtn.key == null) {
         throw new Error("Duplicate key assignment for " +
                         title + ", " +
@@ -275,7 +313,11 @@ var HotKeys = function() { // {{{1
 
   return {
     clearDynamic: function() { // {{{2
-      _assigned.clear();
+      _assigned.clearDynamic();
+    },
+
+    clearAll: function() { // {{{2
+      _assigned.clearAll();
     },
 
     addDynamic: function(title, url) { // {{{2
@@ -296,13 +338,74 @@ var HotKeys = function() { // {{{1
 
     add: function(title, showFunc) { // {{{2
       var rtn = bestKey(title, false);
-      rtn.show = function() { showFunc(rtn.title); }
+      rtn.show = function() { showFunc(rtn.title); };
       if (rtn.key) {
         bind(rtn.key, rtn.show);
       }
       return rtn;
     }
-  }
+  };
 };
+
+// HTML element creation convencience {{{1
+
+function make(elem, props) { // {{{2
+  var e = document.createElement(elem);
+  for (var prop in (props || {})) {
+    switch(prop) {
+      case 'class':
+        e.className = props[prop];
+        break;
+      default:
+        e[prop] = props[prop];
+    }
+  }
+  return e;
+}
+
+function makeLink(title, url) { // {{{2
+  var span = make('span');
+  span.appendChild(make('a', { innerHTML: title, href: url }));
+  return span;
+}
+
+// Default JSON for demonstration {{{1
+
+var page = "https://nosuch.com";
+var defaultJSON = JSON.stringify({
+  "<T>ab1": {
+    "Group1": {
+      "B<o>okmark2": page,
+      "Book<m>ark3": page,
+      "Bookmark4": page,
+      "Bookmark5": page,
+    },
+    "NoGro<u>p1": page,
+    "NoGroup2": page,
+  },
+  "T<a>b2": {
+    "Group2": {
+      "Bookmark6": page,
+      "Bookmark7": page,
+    },
+    "Group3": {
+      "Bookmark8": page,
+      "Bookmark9": page,
+    }
+  },
+  "Ta<b>3": {
+    "Bookmark10": page,
+    "Bookmark11": page,
+    "Bookmark12": page,
+    "Bookmark13": page,
+    "Bookmark14": page,
+    "Bookmark15": page,
+    "Bookmark16": page,
+    "Bookmark17": page,
+    "Bookmark18": page,
+    "Bookmark19": page,
+  },
+}, null, 2);
+
 
 main(); // {{{1
